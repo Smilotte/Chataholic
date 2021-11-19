@@ -9,9 +9,16 @@ import FriendProfile from './component/chatroomContainer/FriendProfile.js';
 import Setting from "./component/innerContainer/Setting.js";
 import ChatRoom from "./component/chatroomContainer/ChatRoom.js";
 import Testing from './component/innerContainer/Testing';
-import {Redirect,Route,Switch} from 'react-router-dom';
+import {Redirect, Route, Switch} from 'react-router-dom';
 import io from "./socket";
 import './App.css';
+import FriendList from "./component/chatroomContainer/FriendList";
+import Pairing from "./component/innerContainer/Pairing";
+import FriendProfile from "./component/chatroomContainer/FriendProfile";
+import Profile from "./component/innerContainer/Profile";
+import Testing from "./component/innerContainer/testing";
+import Setting from "./component/innerContainer/Setting";
+import ChatRoom from "./component/chatroomContainer/ChatRoom";
 
 /**
  * The main interface of the app
@@ -103,7 +110,44 @@ class App extends React.Component {
                        }/>
             </Switch>
         );
-        return routing;
+        return (
+            <Switch>
+                <Route path="/app/friend">
+                    <FriendList
+                        deleteRoom={this.state.socket.leave}
+                        id={this.state.UserId}
+                        logf={this.setLogout}/>
+                </Route>
+                <Route path="/app/pair"
+                       render={(props) =>
+                           <Pairing
+                               {...props}
+                               id={this.state.UserId}
+                               setChatrooms={this.state.socket.setChatrooms}
+                               logf={this.setLogout}/>}
+                />
+                <Route path="/app/photo/:id" render={(props) => <FriendProfile {...props}/>}/>
+                <Route path="/app/profile"><Profile id={this.state.UserId} logf={this.setLogout}/></Route>
+                <Route path="/app/test" render={(props) => <Testing {...props} id={this.state.UserId}/>}/>
+                <Route path="/app/setting"><Setting logf={this.setLogout}/></Route>
+                {/* <Route path="/app/fdsetting" render={(props) => <FriendSetting {...props} logf={this.setLogout}/>}/>  */}
+                <Route path="/app/room/:id/:nickName"
+                       render={(props) =>
+                           <ChatRoom
+                               {...props}
+                               id={this.state.UserId}
+                               onReceive={this.state.socket.onReceive}
+                               unReceive={this.state.socket.unReceive}
+                               getHistory={this.state.socket.getHistory}
+                               setHistory={this.state.socket.setHistory}
+                               unSetHistory={this.state.socket.unSetHistory}
+                               sendMes={this.state.socket.message}
+                               clear={this.state.socket.clearChat}
+                               logf={this.setLogout}
+                           />
+                       }/>
+            </Switch>
+        );
     }
 
     componentWillUnmount(){
